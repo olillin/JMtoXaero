@@ -1,5 +1,7 @@
 plugins {
     id 'java'
+    id 'org.jetbrains.kotlin.jvm' version '1.9.24'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
 group 'com.github.entropy5'
@@ -15,23 +17,19 @@ configurations {
 }
 
 dependencies {
-    shade 'br.com.gamemods:region-manipulator:2.0.0'
+    implementation 'br.com.gamemods:region-manipulator:2.0.0'
 }
 
+tasks.build.dependsOn tasks.shadowJar
+
 jar {
-    from {
-        configurations.shade.collect {
-            it.isDirectory() ? it : zipTree(it)
-        }.unique()
-    } {
-        exclude "META-INF/**"
-        exclude sourceSets.main.output.asFileTree.collect {
-            return it.getPath().split("java/main/").last()
-        }
-    }
     manifest {
         attributes "Implementation-Title": "entropy5",
                 "Implementation-Version": "2.2",
                 "Main-Class": "com.github.entropy5.XaeroRegionMerger"
     }
+}
+
+shadowJar {
+    archiveClassifier = null
 }
